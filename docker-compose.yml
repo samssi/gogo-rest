@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: "postgres:16.1-alpine3.19"
+    environment:
+      - "POSTGRES_USER=gogo"
+      - "POSTGRES_PASSWORD=gogo"
+    ports:
+      - "127.0.0.1:5432:5432"
