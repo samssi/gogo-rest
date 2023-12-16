@@ -44,3 +44,19 @@ resource "kubernetes_deployment" "gogo-postgres-deployment" {
   }
 }
 
+resource "kubernetes_service" "gogo-postgres-service" {
+  metadata {
+    name = local.postgres_service_name
+    namespace = var.kubernetes_namespace
+  }
+  spec {
+    selector = {
+      app = var.postgres_image
+    }
+    port {
+      port = var.postgres_port
+      target_port = var.postgres_port
+      protocol = "TCP"
+    }
+  }
+}

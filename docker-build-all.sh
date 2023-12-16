@@ -1,0 +1,1 @@
+docker build -f migrations.Dockerfile -t gogo-migration:dev .
