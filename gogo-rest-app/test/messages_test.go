@@ -17,6 +17,10 @@ type messagePayload struct {
 	Message string `json:"message"`
 }
 
+type invalidMessagePayload struct {
+	InvalidMessage string `json:"messagefoo"`
+}
+
 func clearDatabase() {
 	_, _ = db.Pool.Exec(context.Background(), "delete from message")
 }
@@ -74,6 +78,19 @@ func (s *MessagesSuite) TestPostMessageIsInsertedToDB() {
 	s.router.ServeHTTP(w, getReq)
 
 	s.Assert().Equal("{\"message\":\"hello!\"}", w.Body.String())
+}
+
+func (s *MessagesSuite) TestPostReturnsBadRequestWhenInvalidJsonIsSent() {
+	payload := invalidMessagePayload{InvalidMessage: "hello!"}
+
+	jsonPayload, _ := json.Marshal(payload)
+
+	w := httptest.NewRecorder()
+	postReq, _ := http.NewRequest("POST", "/v1/messages/", bytes.NewBuffer(jsonPayload))
+
+	s.router.ServeHTTP(w, postReq)
+
+	s.Assert().Equal(400, w.Code)
 }
 
 func TestMessagesSuite(t *testing.T) {

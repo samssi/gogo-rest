@@ -7,22 +7,24 @@ import (
 )
 
 type message struct {
-	Message string `json:"message"`
+	Message string `json:"message" binding:"required"`
 }
 
 func ReadMessage(ginContext *gin.Context) {
-	message := popMessage()
+	dbMessage := popMessage()
 
-	log.Printf("Returning message to the client: %v\n", message)
+	log.Printf("Returning message to the client: %v\n", dbMessage.message)
 
-	if message == nil {
+	if dbMessage == nil {
 		ginContext.Status(http.StatusNoContent)
 		return
 	}
 
-	ginContext.JSON(http.StatusOK, gin.H{
-		"message": message.message,
-	})
+	message := message{
+		Message: dbMessage.message,
+	}
+
+	ginContext.JSON(http.StatusOK, message)
 }
 
 func CreateMessage(ginContext *gin.Context) {
