@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  postgres:
-    image: "postgres:16.1-alpine3.19"
+  gogo-postgres:
+    image: "gogo-postgres:dev"
     environment:
       - "POSTGRES_USER=gogo"
       - "POSTGRES_PASSWORD=gogo"

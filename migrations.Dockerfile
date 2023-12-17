@@ -8,3 +8,5 @@ RUN rm -rf /flyway/sql/*
 
 COPY migrations/sql/* /flyway/sql/
 COPY migrations/conf/* /flyway/conf/
+
+

@@ -4,8 +4,8 @@ locals {
   postgres_user           = "gogo"
   postgres_password       = "gogo"
   postgres_secret_name    = "gogo-postgres-secret"
-  postgres_image          = "postgres"
-  postgres_image_version  = "16.1-alpine3.19"
+  postgres_image          = "gogo-postgres"
+  postgres_image_version  = "dev"
   kubernetes_namespace    = "gogo"
 }
 
