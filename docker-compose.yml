@@ -8,8 +8,3 @@ services:
       - "POSTGRES_PASSWORD=gogo"
     ports:
       - "127.0.0.1:5432:5432"
-
-  gogo-rest-app:
-    image: "gogo-rest-app:dev"
-    ports:
-      - "127.0.0.1:8080:8080"
