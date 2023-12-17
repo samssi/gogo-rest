@@ -1,7 +1,7 @@
 package main
 
-import "gogo-rest-app/rest"
+import "gogo-rest-app/routes"
 
 func main() {
-	rest.Start()
+	routes.Start()
 }
