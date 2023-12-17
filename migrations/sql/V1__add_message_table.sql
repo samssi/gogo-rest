@@ -4,5 +4,3 @@ create table public.message (
     message_id SERIAL PRIMARY KEY,
     message TEXT NOT NULL
 );
-
-INSERT INTO public.message (message) VALUES ('Hello');
