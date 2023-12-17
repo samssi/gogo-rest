@@ -35,7 +35,7 @@ func (s *MessagesSuite) SetupTest() {
 	clearDatabase()
 }
 
-func (s *MessagesSuite) TestGETMessageReturnsCurrentMessageFromDB() {
+func (s *MessagesSuite) TestGETMessageReturnsOldestMessageFromDB() {
 	insertTestMessageIntoDatabase("hey there!")
 	insertTestMessageIntoDatabase("hey there2!")
 
