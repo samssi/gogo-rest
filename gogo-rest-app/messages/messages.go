@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type Message struct {
+type message struct {
 	message string
 }
 
@@ -22,8 +22,8 @@ func queryMessages() string {
 	return message
 }
 
-func insertMessage(message Message) {
-	log.Printf("Adding message to the db: %v\n", message)
+func insertMessage(message message) {
+	log.Printf("Adding message to the db: %v\n", message.message)
 
 	_, err := db.Pool.Exec(context.Background(), "insert into message (message) values ($1)", message.message)
 	if err != nil {
@@ -42,14 +42,15 @@ func ReadMessages(ginContext *gin.Context) {
 }
 
 func CreateMessage(ginContext *gin.Context) {
-	var message Message
+	var message message
 
-	parsingErr := ginContext.ShouldBindJSON(&message)
-
-	if parsingErr != nil {
+	if err := ginContext.BindJSON(&message); err != nil {
 		ginContext.Status(http.StatusBadRequest)
 		return
 	}
+
+	log.Println("message.message")
+	log.Println(message.message)
 
 	insertMessage(message)
 
