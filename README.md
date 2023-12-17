@@ -2,7 +2,9 @@
 Basic REST API developed with Go and Gin framework
 
 The API is simple:
+
     1. User can send messages to API with POST /v1/messages/
+
     2. User can pop the oldest message from the API with GET /v1/messages/
 
 Endpoints are tested using testify-library with "local integration tests", meaning
