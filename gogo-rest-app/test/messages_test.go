@@ -14,7 +14,7 @@ import (
 )
 
 type messagePayload struct {
-	message string `json:"message"`
+	Message string `json:"message"`
 }
 
 func clearDatabase() {
@@ -59,16 +59,20 @@ func (s *MessagesSuite) TestGETMessageReturnsStatusNoContentWhenDbHasNoMessages(
 }
 
 func (s *MessagesSuite) TestPostMessageIsInsertedToDB() {
-	payload := messagePayload{message: "hello!"}
+	payload := messagePayload{Message: "hello!"}
 
 	jsonPayload, _ := json.Marshal(payload)
 
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/v1/messages/", bytes.NewBuffer(jsonPayload))
+	postReq, _ := http.NewRequest("POST", "/v1/messages/", bytes.NewBuffer(jsonPayload))
 
-	s.router.ServeHTTP(w, req)
+	s.router.ServeHTTP(w, postReq)
 
 	s.Assert().Equal(200, w.Code)
+
+	getReq, _ := http.NewRequest("GET", "/v1/messages/", nil)
+	s.router.ServeHTTP(w, getReq)
+
 	s.Assert().Equal("{\"message\":\"hello!\"}", w.Body.String())
 }
 
