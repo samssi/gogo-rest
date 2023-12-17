@@ -23,6 +23,19 @@ docker compose up -d gogo-postgres
 
 main.go, main-function runs the software.
 
+There are two scripts that can be used to send and pop messages via the API.
+Scripts are using curl.
+
+Sending a message:
+```
+./send-message.sh
+```
+
+Popping the latest message:
+```
+./get-message.sh
+```
+
 ## Running the tests
 
 During the tests Postgres-container must be run by using docker-compose:
@@ -60,6 +73,11 @@ cd terraform/gogo-rest/environments/dev/
 terraform init
 terraform apply
 ```
+
+## Secrets
+
+Currently secrets are not in use. If the app would have actual server environments the secret configuration
+should be created.
 
 ## Flyway migrations
 
