@@ -18,6 +18,11 @@ variable "gogo_rest_app_port" {
   description = "Gogo rest app port"
 }
 
+variable "gogo_rest_app_public_port" {
+  type = number
+  description = "Gogo rest app target port"
+}
+
 variable "kubernetes_namespace" {
   type        = string
   description = "Target Kubernetes namespace"

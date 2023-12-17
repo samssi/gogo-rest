@@ -53,7 +53,7 @@ resource "kubernetes_service" "gogo-rest-app-service" {
       app = var.gogo_rest_app_image
     }
     port {
-      port        = var.gogo_rest_app_port
+      port        = var.gogo_rest_app_public_port
       target_port = var.gogo_rest_app_port
       protocol    = "TCP"
     }

@@ -11,7 +11,7 @@ resource "kubernetes_deployment" "gogo-postgres-deployment" {
   spec {
     selector {
       match_labels = {
-        app = local.postgres_deployment_name
+        app = var.postgres_image
       }
     }
     replicas = 1
@@ -19,7 +19,7 @@ resource "kubernetes_deployment" "gogo-postgres-deployment" {
     template {
       metadata {
         labels = {
-          app = local.postgres_deployment_name
+          app = var.postgres_image
         }
       }
 
@@ -51,7 +51,7 @@ resource "kubernetes_service" "gogo-postgres-service" {
   }
   spec {
     selector = {
-      app = local.postgres_service_name
+      app = var.postgres_image
     }
     port {
       port = var.postgres_port

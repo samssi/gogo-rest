@@ -1,9 +1,10 @@
 locals {
-  postgres_host           = "gogo-postgres"
+  postgres_schema         = "gogo"
+  postgres_host           = "gogo-postgres-service"
   postgres_port           = 5432
   postgres_user           = "gogo"
   postgres_password       = "gogo"
-  postgres_secret_name    = "gogo-postgres-secret"
+  postgres_connection_url = "${local.postgres_user}:${local.postgres_password}@${local.postgres_host}:${local.postgres_port}/${local.postgres_schema}"
   postgres_image          = "gogo-postgres"
   postgres_image_version  = "dev"
   kubernetes_namespace    = "gogo"
@@ -44,6 +45,7 @@ module "gogo-rest-app" {
   gogo_rest_app_image = "gogo-rest-app"
   gogo_rest_app_image_version = "dev"
   gogo_rest_app_port = "8080"
+  gogo_rest_app_public_port = "8085"
   kubernetes_namespace = "gogo"
   replicas = 1
 }
