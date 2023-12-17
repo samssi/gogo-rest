@@ -57,5 +57,6 @@ resource "kubernetes_service" "gogo-rest-app-service" {
       target_port = var.gogo_rest_app_port
       protocol    = "TCP"
     }
+    type = "LoadBalancer"
   }
 }

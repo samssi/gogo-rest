@@ -47,5 +47,5 @@ module "gogo-rest-app" {
   gogo_rest_app_port = "8080"
   gogo_rest_app_public_port = "8085"
   kubernetes_namespace = "gogo"
-  replicas = 1
+  replicas = 2
 }
