@@ -1,49 +1,34 @@
 package messages
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
-	"gogo-rest-app/db"
 	"log"
 	"net/http"
 )
 
 type message struct {
-	message string
-}
-
-func queryMessages() string {
-	var message string
-	if err := db.Pool.QueryRow(context.Background(), "select message from message").Scan(&message); err != nil {
-		log.Printf("QueryRow failed: %v\n", err)
-	}
-
-	return message
-}
-
-func insertMessage(message message) {
-	log.Printf("Adding message to the db: %v\n", message.message)
-
-	_, err := db.Pool.Exec(context.Background(), "insert into message (message) values ($1)", message.message)
-	if err != nil {
-		log.Printf("Insert exec failed: %v\n", err)
-	}
+	message string `json:"message"`
 }
 
 func ReadMessages(ginContext *gin.Context) {
-	message := queryMessages()
+	message := popMessage()
 
 	log.Printf("Returning message to the client: %v\n", message)
 
+	if message.message == "" {
+		ginContext.Status(http.StatusNoContent)
+		return
+	}
+
 	ginContext.JSON(http.StatusOK, gin.H{
-		"message": message,
+		"message": message.message,
 	})
 }
 
 func CreateMessage(ginContext *gin.Context) {
 	var message message
 
-	if err := ginContext.BindJSON(&message); err != nil {
+	if err := ginContext.ShouldBindJSON(&message); err != nil {
 		ginContext.Status(http.StatusBadRequest)
 		return
 	}
@@ -54,12 +39,4 @@ func CreateMessage(ginContext *gin.Context) {
 	insertMessage(message)
 
 	ginContext.Status(http.StatusOK)
-}
-
-func UpdateMessage(ginContext *gin.Context) {
-
-}
-
-func DeleteMessage(ginContext *gin.Context) {
-
 }

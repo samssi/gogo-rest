@@ -37,6 +37,7 @@ func (s *MessagesSuite) SetupTest() {
 
 func (s *MessagesSuite) TestGETMessageReturnsCurrentMessageFromDB() {
 	insertTestMessageIntoDatabase("hey there!")
+	insertTestMessageIntoDatabase("hey there2!")
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/v1/messages/", nil)
@@ -45,6 +46,16 @@ func (s *MessagesSuite) TestGETMessageReturnsCurrentMessageFromDB() {
 
 	s.Assert().Equal(200, w.Code)
 	s.Assert().Equal("{\"message\":\"hey there!\"}", w.Body.String())
+}
+
+func (s *MessagesSuite) TestGETMessageReturnsStatusNoContentWhenDbHasNoMessages() {
+	clearDatabase()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/v1/messages/", nil)
+
+	s.router.ServeHTTP(w, req)
+
+	s.Assert().Equal(204, w.Code)
 }
 
 func (s *MessagesSuite) TestPostMessageIsInsertedToDB() {
