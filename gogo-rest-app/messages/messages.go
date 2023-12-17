@@ -13,12 +13,12 @@ type message struct {
 func ReadMessage(ginContext *gin.Context) {
 	dbMessage := popMessage()
 
-	log.Printf("Returning message to the client: %v\n", dbMessage.message)
-
 	if dbMessage == nil {
 		ginContext.Status(http.StatusNoContent)
 		return
 	}
+
+	log.Printf("Returning message to the client: %v\n", dbMessage.message)
 
 	message := message{
 		Message: dbMessage.message,
