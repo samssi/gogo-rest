@@ -7,7 +7,7 @@ import (
 )
 
 type message struct {
-	message string `json:"message"`
+	Message string `json:"message"`
 }
 
 func ReadMessage(ginContext *gin.Context) {
@@ -32,9 +32,6 @@ func CreateMessage(ginContext *gin.Context) {
 		ginContext.Status(http.StatusBadRequest)
 		return
 	}
-
-	log.Println("message.message")
-	log.Println(message.message)
 
 	insertMessage(message)
 

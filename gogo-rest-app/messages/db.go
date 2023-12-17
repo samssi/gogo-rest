@@ -30,9 +30,9 @@ func popMessage() *dbMessage {
 }
 
 func insertMessage(message message) {
-	log.Printf("Adding message to the db: %v\n", message.message)
+	log.Printf("Adding message to the db: %v\n", message.Message)
 
-	_, err := db.Pool.Exec(context.Background(), "insert into message (message) values ($1)", message.message)
+	_, err := db.Pool.Exec(context.Background(), "insert into message (message) values ($1)", message.Message)
 	if err != nil {
 		log.Printf("Insert exec failed: %v\n", err)
 	}
