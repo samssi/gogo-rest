@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gogo-rest-app/health"
 	"gogo-rest-app/messages"
@@ -26,9 +25,9 @@ func (routes routes) healthCheckRouterGroup(routerGroup *gin.RouterGroup) {
 	healthCheckRouterGroup.GET("/", health.ReturnStatus)
 }
 
-func Start() {
+func setupRouter() *gin.Engine {
 	routes := routes{
-		gin.New(),
+		gin.Default(),
 	}
 
 	root := routes.router.Group("/")
@@ -37,8 +36,5 @@ func Start() {
 	routes.healthCheckRouterGroup(root)
 	routes.messageRouterGroup(v1)
 
-	err := routes.router.Run()
-	if err != nil {
-		fmt.Println("Failed to run gin server")
-	}
+	return routes.router
 }
