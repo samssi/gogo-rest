@@ -14,7 +14,7 @@ func (routes routes) messageRouterGroup(routerGroup *gin.RouterGroup) {
 	messageRouterGroup := routerGroup.Group("/messages")
 	messageRouterGroup.Use(gin.Logger())
 
-	messageRouterGroup.GET("/", messages.ReadMessages)
+	messageRouterGroup.GET("/", messages.ReadMessage)
 	messageRouterGroup.POST("/", messages.CreateMessage)
 
 }

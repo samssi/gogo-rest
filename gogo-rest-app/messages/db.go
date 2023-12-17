@@ -7,8 +7,8 @@ import (
 )
 
 type dbMessage struct {
-	messageId int    //`json:"id"`
-	message   string //`json:"message"`
+	messageId int
+	message   string
 }
 
 func deleteMessage(messageId int) {
@@ -18,15 +18,15 @@ func deleteMessage(messageId int) {
 	}
 }
 
-func popMessage() dbMessage {
+func popMessage() *dbMessage {
 	var message dbMessage
 	if err := db.Pool.QueryRow(context.Background(), "select message_id, message from message order by message_id").Scan(&message.messageId, &message.message); err != nil {
-		log.Printf("QueryRow failed: %v\n", err)
+		return nil
 	}
 
 	deleteMessage(message.messageId)
 
-	return message
+	return &message
 }
 
 func insertMessage(message message) {

@@ -10,12 +10,12 @@ type message struct {
 	message string `json:"message"`
 }
 
-func ReadMessages(ginContext *gin.Context) {
+func ReadMessage(ginContext *gin.Context) {
 	message := popMessage()
 
 	log.Printf("Returning message to the client: %v\n", message)
 
-	if message.message == "" {
+	if message == nil {
 		ginContext.Status(http.StatusNoContent)
 		return
 	}
