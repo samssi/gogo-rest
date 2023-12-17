@@ -9,10 +9,21 @@ import (
 	"os"
 )
 
-func main() {
-	databaseUrl := "postgres://gogo:gogo@localhost:5432"
+func createConnectionUrl() string {
+	postgresHost, exists := os.LookupEnv("db_connection_string")
 
-	dbPool, err := pgxpool.New(context.Background(), databaseUrl)
+	if !exists {
+		return "postgres://gogo:gogo@localhost:5432/gogo"
+	}
+
+	return postgresHost
+}
+
+func main() {
+	connectionUrl := createConnectionUrl()
+	fmt.Printf("Database connection url set as: %v\n", connectionUrl)
+
+	dbPool, err := pgxpool.New(context.Background(), connectionUrl)
 	if err != nil {
 		fmt.Println("Failed to establish connection")
 		os.Exit(1)

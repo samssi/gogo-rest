@@ -33,6 +33,10 @@ resource "kubernetes_deployment" "gogo-rest-app-deployment" {
           port {
             container_port = var.gogo_rest_app_port
           }
+          env {
+            name = "db_connection_string"
+            value = "postgres://gogo:gogo@gogo-postgres-service:5432/gogo"
+          }
         }
       }
     }
