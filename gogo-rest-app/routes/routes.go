@@ -13,8 +13,10 @@ type routes struct {
 
 func (routes routes) messageRouterGroup(routerGroup *gin.RouterGroup) {
 	messageRouterGroup := routerGroup.Group("/messages")
+	messageRouterGroup.Use(gin.Logger())
 
-	messageRouterGroup.GET("/", messages.FetchMessages)
+	messageRouterGroup.GET("/", messages.ReadMessages)
+	messageRouterGroup.POST("/", messages.CreateMessage)
 
 }
 
@@ -26,7 +28,7 @@ func (routes routes) healthCheckRouterGroup(routerGroup *gin.RouterGroup) {
 
 func Start() {
 	routes := routes{
-		gin.Default(),
+		gin.New(),
 	}
 
 	root := routes.router.Group("/")

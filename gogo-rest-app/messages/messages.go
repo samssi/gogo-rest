@@ -2,22 +2,64 @@ package messages
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gogo-rest-app/db"
+	"log"
 	"net/http"
 )
 
-func FetchMessages(ginContext *gin.Context) {
+type Message struct {
+	message string
+}
+
+func queryMessages() string {
 	var message string
-	var err = db.Pool.QueryRow(context.Background(), "select message from message").Scan(&message)
+	err := db.Pool.QueryRow(context.Background(), "select message from message").Scan(&message)
 	if err != nil {
-		fmt.Printf("QueryRow failed: %v\n", err)
+		log.Printf("QueryRow failed: %v\n", err)
 	}
 
-	fmt.Printf("Returning message to the client: %v\n", message)
+	return message
+}
+
+func insertMessage(message Message) {
+	log.Printf("Adding message to the db: %v\n", message)
+
+	_, err := db.Pool.Exec(context.Background(), "insert into message (message) values ($1)", message.message)
+	if err != nil {
+		log.Printf("Insert exec failed: %v\n", err)
+	}
+}
+
+func ReadMessages(ginContext *gin.Context) {
+	message := queryMessages()
+
+	log.Printf("Returning message to the client: %v\n", message)
 
 	ginContext.JSON(http.StatusOK, gin.H{
-		"Db contains message": message,
+		"message": message,
 	})
+}
+
+func CreateMessage(ginContext *gin.Context) {
+	var message Message
+
+	parsingErr := ginContext.ShouldBindJSON(&message)
+
+	if parsingErr != nil {
+		ginContext.Status(http.StatusBadRequest)
+		return
+	}
+
+	insertMessage(message)
+
+	ginContext.Status(http.StatusOK)
+}
+
+func UpdateMessage(ginContext *gin.Context) {
+
+}
+
+func DeleteMessage(ginContext *gin.Context) {
+
 }
