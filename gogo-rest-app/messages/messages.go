@@ -14,8 +14,7 @@ type message struct {
 
 func queryMessages() string {
 	var message string
-	err := db.Pool.QueryRow(context.Background(), "select message from message").Scan(&message)
-	if err != nil {
+	if err := db.Pool.QueryRow(context.Background(), "select message from message").Scan(&message); err != nil {
 		log.Printf("QueryRow failed: %v\n", err)
 	}
 

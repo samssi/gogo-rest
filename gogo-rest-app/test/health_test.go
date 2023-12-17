@@ -1,14 +1,18 @@
 package test
 
 import (
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/suite"
 	"gogo-rest-app/routes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestHealthRoute(t *testing.T) {
+type HealthSuite struct {
+	suite.Suite
+}
+
+func (s *HealthSuite) TestHealthRoute() {
 	router := routes.StartApp()
 
 	w := httptest.NewRecorder()
@@ -17,5 +21,9 @@ func TestHealthRoute(t *testing.T) {
 
 	router.ServeHTTP(w, req)
 
-	assert.Equal(t, 200, w.Code)
+	s.Assert().Equal(200, w.Code)
+}
+
+func TestHealthSuite(t *testing.T) {
+	suite.Run(t, new(HealthSuite))
 }
