@@ -32,9 +32,15 @@ async fn read_message() -> ApiResponse {
     JsonData(message)
 }
 
+async fn health_check() -> ApiResponse {
+    ApiResponse::Ok
+}
+
 fn router() -> Router {
     Router::new()
-        .route("/", get(read_message))
+        .route("/health", get(health_check))
+        .route("/v1/messages", get(read_message))
+        // .route("/v1/messages", post(post_message))
 }
 
 #[tokio::main]
