@@ -1,42 +1,8 @@
-use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
-use axum::{Json, Router};
+use axum::{Router};
 use axum::routing::get;
-use serde::Serialize;
-use crate::routes::routes::ApiResponse::JsonData;
-
-
-#[derive(Serialize)]
-struct Message {
-    message: String
-}
-
-enum ApiResponse {
-    Ok,
-    JsonData(Message)
-}
-
-impl IntoResponse for ApiResponse {
-    fn into_response(self) -> Response {
-        match self {
-            ApiResponse::Ok => (StatusCode::OK).into_response(),
-            JsonData(message) => (StatusCode::OK, Json(message)).into_response()
-        }
-    }
-}
-
-async fn read_message() -> ApiResponse {
-    let message = Message {
-        message: String::from("Hi there!")
-    };
-
-    JsonData(message)
-}
-
-async fn health_check() -> ApiResponse {
-    ApiResponse::Ok
-}
-
+use crate::health::health::health_check;
+use crate::messages::messages::read_message;
+use crate::routes::response::ApiResponse;
 pub fn router() -> Router {
     Router::new()
         .route("/health", get(health_check))
