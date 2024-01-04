@@ -1,7 +1,8 @@
-use serde::Serialize;
+use axum::Json;
+use serde::{Deserialize, Serialize};
 use crate::routes::response::ApiResponse;
 
-#[derive(Serialize)]
+#[derive(Serialize,Deserialize,Debug)]
 pub struct Message {
     pub message: String
 }
@@ -12,4 +13,10 @@ pub async fn read_message() -> ApiResponse {
     };
 
     ApiResponse::JsonData(message)
+}
+
+pub async fn create_message(Json(message): Json<Message>) -> ApiResponse {
+    println!("{:?}", message);
+
+    ApiResponse::Ok
 }
