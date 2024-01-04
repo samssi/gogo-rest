@@ -1,13 +1,13 @@
 use axum::{Router};
 use axum::routing::get;
-use deadpool_postgres::Pool;
+use crate::db::db::init_deadpool;
 use crate::health::health::health_check;
 use crate::messages::messages::{read_message, create_message};
 use crate::routes::response::AppState;
 
-pub fn router(dbPool: Pool) -> Router {
+pub async fn router() -> Router {
     let state = AppState {
-        db_pool: dbPool
+        db_pool: init_deadpool()
     };
 
     Router::new()

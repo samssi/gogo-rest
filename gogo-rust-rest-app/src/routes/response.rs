@@ -1,7 +1,8 @@
 use axum::http::StatusCode;
 use axum::Json;
 use axum::response::{IntoResponse, Response};
-use deadpool_postgres::Pool;
+use deadpool_postgres::{Pool};
+
 use crate::messages::messages::Message;
 
 #[derive(Clone)]
