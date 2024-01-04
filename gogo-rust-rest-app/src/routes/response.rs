@@ -1,7 +1,13 @@
 use axum::http::StatusCode;
 use axum::Json;
 use axum::response::{IntoResponse, Response};
+use deadpool_postgres::Pool;
 use crate::messages::messages::Message;
+
+#[derive(Clone)]
+pub struct AppState {
+    pub db_pool: Pool
+}
 
 pub enum ApiResponse {
     Ok,
