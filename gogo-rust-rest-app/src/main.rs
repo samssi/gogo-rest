@@ -1,6 +1,8 @@
 use crate::routes::routes::router;
 
 mod routes;
+mod messages;
+mod health;
 
 #[tokio::main]
 async fn main() {
