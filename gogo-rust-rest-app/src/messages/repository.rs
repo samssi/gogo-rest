@@ -1,5 +1,5 @@
 use crate::core::axum::AppState;
-use crate::core::errors::DatabaseError;
+use crate::core::errors::*;
 use std::sync::Arc;
 
 pub struct DbMessage {
@@ -7,18 +7,12 @@ pub struct DbMessage {
     message: String,
 }
 
-impl From<tokio_postgres::Error> for DatabaseError {
-    fn from(error: tokio_postgres::Error) -> DatabaseError {
-        DatabaseError::Postgres(error)
-    }
-}
-
 impl DbMessage {
     pub async fn insert_message(
         app_state: Arc<AppState>,
         message: String,
     ) -> Result<(), DatabaseError> {
-        let connection = app_state.db_pool.get().await.unwrap();
+        let connection = app_state.db_pool.get().await?;
 
         connection
             .execute("insert into message (message) values ($1)", &[&message])
@@ -27,8 +21,8 @@ impl DbMessage {
         Ok(())
     }
 
-    pub async fn pop_message(app_state: AppState) {
-        let connection = app_state.db_pool.get().await.unwrap();
+    pub async fn pop_message(app_state: AppState) -> Result<String, DatabaseError> {
+        let connection = app_state.db_pool.get().await?;
 
         // connection.query("");
         todo!()
