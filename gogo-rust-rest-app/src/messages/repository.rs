@@ -22,7 +22,12 @@ impl DbMessage {
         let connection = state.db_pool.get().await?;
 
         connection
-            .execute("insert into message (message) values ($1)", &[&message])
+            .execute(
+                r#"
+            INSERT INTO message (message) 
+            VALUES ($1)"#,
+                &[&message],
+            )
             .await?;
 
         Ok(())
