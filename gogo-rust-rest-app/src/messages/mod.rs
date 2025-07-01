@@ -1,2 +1,2 @@
-pub mod messages;
 mod db;
+pub mod messages;
