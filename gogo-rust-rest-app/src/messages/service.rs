@@ -1,6 +1,7 @@
+use crate::common::axum::AppState;
 use crate::common::errors::DatabaseError;
 use crate::messages::repository::DbMessage;
-use crate::routes::response::AppState;
+use std::sync::Arc;
 
 pub struct Message {
     pub message: String,
@@ -17,7 +18,10 @@ impl From<DatabaseError> for MessageServiceError {
 }
 
 impl Message {
-    pub async fn add_message(state: AppState, message: String) -> Result<(), MessageServiceError> {
+    pub async fn add_message(
+        state: Arc<AppState>,
+        message: String,
+    ) -> Result<(), MessageServiceError> {
         DbMessage::insert_message(state, message).await?;
         Ok(())
     }

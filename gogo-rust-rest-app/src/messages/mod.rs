@@ -1,4 +1,3 @@
-pub mod messages;
 mod repository;
-mod router;
+pub mod router;
 mod service;
