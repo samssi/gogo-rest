@@ -9,10 +9,10 @@ pub struct DbMessage {
 
 impl DbMessage {
     pub async fn insert_message(
-        app_state: Arc<AppState>,
+        state: Arc<AppState>,
         message: String,
     ) -> Result<(), DatabaseError> {
-        let connection = app_state.db_pool.get().await?;
+        let connection = state.db_pool.get().await?;
 
         connection
             .execute("insert into message (message) values ($1)", &[&message])
@@ -21,8 +21,8 @@ impl DbMessage {
         Ok(())
     }
 
-    pub async fn pop_message(app_state: Arc<AppState>) -> Result<String, DatabaseError> {
-        let connection = app_state.db_pool.get().await?;
+    pub async fn pop_message(state: Arc<AppState>) -> Result<String, DatabaseError> {
+        let connection = state.db_pool.get().await?;
 
         // connection.query("");
         todo!()

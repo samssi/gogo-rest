@@ -33,18 +33,18 @@ impl From<MessageServiceError> for AxumApplicationError {
 
 impl Message {
     pub async fn post_message(
-        State(app_state): State<Arc<AppState>>,
+        State(state): State<Arc<AppState>>,
         Json(message): Json<Message>,
     ) -> Result<impl IntoResponse, AxumApplicationError> {
         println!("{:?}", message);
 
-        service::Message::add_message(app_state, message.message).await?;
+        service::Message::add_message(state, message.message).await?;
 
         Ok(StatusCode::OK.into_response())
     }
 
     pub async fn get_message(
-        State(app_state): State<Arc<AppState>>,
+        State(state): State<Arc<AppState>>,
     ) -> Result<impl IntoResponse, AxumApplicationError> {
         let message = service::Message::read_message().await?;
         Ok((StatusCode::OK, Json(message)))
