@@ -1,5 +1,6 @@
+use crate::common::axum::AppState;
 use crate::common::errors::DatabaseError;
-use crate::routes::response::AppState;
+use std::sync::Arc;
 
 pub struct DbMessage {
     message_id: u64,
@@ -13,7 +14,10 @@ impl From<tokio_postgres::Error> for DatabaseError {
 }
 
 impl DbMessage {
-    pub async fn insert_message(app_state: AppState, message: String) -> Result<(), DatabaseError> {
+    pub async fn insert_message(
+        app_state: Arc<AppState>,
+        message: String,
+    ) -> Result<(), DatabaseError> {
         let connection = app_state.db_pool.get().await.unwrap();
 
         connection
