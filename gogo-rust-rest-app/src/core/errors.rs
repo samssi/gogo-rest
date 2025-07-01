@@ -1,11 +1,23 @@
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use deadpool_postgres::PoolError;
-use std::fmt;
+use deadpool_postgres::{CreatePoolError, PoolError};
+use std::{fmt, io};
 
 #[derive(Debug)]
 pub enum ApplicationError {
     StartupError(String),
+}
+
+impl From<io::Error> for ApplicationError {
+    fn from(err: io::Error) -> Self {
+        ApplicationError::StartupError(err.to_string())
+    }
+}
+
+impl From<CreatePoolError> for ApplicationError {
+    fn from(err: CreatePoolError) -> Self {
+        ApplicationError::StartupError(format!("Failed to create Postgres database pool: {err}"))
+    }
 }
 
 pub enum DatabaseError {
