@@ -3,27 +3,20 @@ use crate::core::errors::AxumApplicationError;
 use crate::messages::service;
 use crate::messages::service::MessageServiceError;
 use axum::extract::State;
-use axum::routing::post;
+use axum::routing::{get, post};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
 pub fn create_messages_router() -> Router<Arc<AppState>> {
-    Router::new().route("/api/v1/messages", post(create_message))
+    Router::new()
+        .route("/api/v1/messages", post(Message::post_message))
+        .route("/api/v1/messages", get(Message::get_message))
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Message {
     pub message: String,
-}
-
-pub async fn read_message(State(_app_state): State<AppState>) -> ApiResponse {
-    let message = Message {
-        message: String::from("Hi there!"),
-    };
-
-    // TODO: return the message instead of OK later
-    ApiResponse::Ok
 }
 
 impl From<MessageServiceError> for AxumApplicationError {
@@ -36,13 +29,24 @@ impl From<MessageServiceError> for AxumApplicationError {
     }
 }
 
-pub async fn create_message(
-    State(app_state): State<Arc<AppState>>,
-    Json(message): Json<Message>,
-) -> Result<ApiResponse, AxumApplicationError> {
-    println!("{:?}", message);
+impl Message {
+    pub async fn post_message(
+        State(app_state): State<Arc<AppState>>,
+        Json(message): Json<Message>,
+    ) -> Result<ApiResponse, AxumApplicationError> {
+        println!("{:?}", message);
 
-    service::Message::add_message(app_state, message.message).await?;
+        service::Message::add_message(app_state, message.message).await?;
 
-    Ok(ApiResponse::Ok)
+        Ok(ApiResponse::Ok)
+    }
+
+    pub async fn get_message(
+        State(app_state): State<Arc<AppState>>,
+    ) -> Result<ApiResponse, AxumApplicationError> {
+        let _message = service::Message::read_message().await?;
+
+        // TODO: return the message instead of OK later
+        Ok(ApiResponse::Ok)
+    }
 }
