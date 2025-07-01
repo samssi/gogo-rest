@@ -1,8 +1,10 @@
-use crate::core::axum::{ApiResponse, AppState};
+use crate::core::axum::AppState;
 use crate::core::errors::AxumApplicationError;
 use crate::messages::service;
 use crate::messages::service::MessageServiceError;
 use axum::extract::State;
+use axum::http::StatusCode;
+use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use serde::{Deserialize, Serialize};
@@ -33,20 +35,18 @@ impl Message {
     pub async fn post_message(
         State(app_state): State<Arc<AppState>>,
         Json(message): Json<Message>,
-    ) -> Result<ApiResponse, AxumApplicationError> {
+    ) -> Result<impl IntoResponse, AxumApplicationError> {
         println!("{:?}", message);
 
         service::Message::add_message(app_state, message.message).await?;
 
-        Ok(ApiResponse::Ok)
+        Ok(StatusCode::OK.into_response())
     }
 
     pub async fn get_message(
         State(app_state): State<Arc<AppState>>,
-    ) -> Result<ApiResponse, AxumApplicationError> {
-        let _message = service::Message::read_message().await?;
-
-        // TODO: return the message instead of OK later
-        Ok(ApiResponse::Ok)
+    ) -> Result<impl IntoResponse, AxumApplicationError> {
+        let message = service::Message::read_message().await?;
+        Ok((StatusCode::OK, Json(message)))
     }
 }
