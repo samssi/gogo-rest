@@ -25,4 +25,8 @@ impl Message {
         DbMessage::insert_message(state, message).await?;
         Ok(())
     }
+
+    pub async fn read_message() -> Result<String, MessageServiceError> {
+        Ok("this is fine!".to_string())
+    }
 }

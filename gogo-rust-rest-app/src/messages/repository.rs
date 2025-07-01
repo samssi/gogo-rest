@@ -21,7 +21,7 @@ impl DbMessage {
         Ok(())
     }
 
-    pub async fn pop_message(app_state: AppState) -> Result<String, DatabaseError> {
+    pub async fn pop_message(app_state: Arc<AppState>) -> Result<String, DatabaseError> {
         let connection = app_state.db_pool.get().await?;
 
         // connection.query("");
