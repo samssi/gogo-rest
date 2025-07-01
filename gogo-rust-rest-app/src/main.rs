@@ -1,14 +1,11 @@
+use crate::common::errors::ApplicationError;
 use crate::routes::routes::router;
 
+mod common;
 mod db;
 mod health;
 mod messages;
 mod routes;
-
-#[derive(Debug)]
-pub enum ApplicationError {
-    StartupError(String),
-}
 
 #[tokio::main]
 async fn main() -> Result<(), ApplicationError> {
