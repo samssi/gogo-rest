@@ -26,7 +26,13 @@ impl Message {
         Ok(())
     }
 
-    pub async fn read_message() -> Result<String, MessageServiceError> {
-        Ok("this is fine!".to_string())
+    pub async fn read_message(state: Arc<AppState>) -> Result<Option<String>, MessageServiceError> {
+        let db_message = DbMessage::pop_message(state).await?;
+        let message = match db_message {
+            Some(db_message) => Some(db_message.message),
+            None => None,
+        };
+
+        Ok(message)
     }
 }

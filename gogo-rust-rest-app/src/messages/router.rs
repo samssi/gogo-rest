@@ -46,7 +46,7 @@ impl Message {
     pub async fn get_message(
         State(state): State<Arc<AppState>>,
     ) -> Result<impl IntoResponse, AxumApplicationError> {
-        let message = service::Message::read_message().await?;
+        let message = service::Message::read_message(state).await?;
         Ok((StatusCode::OK, Json(message)))
     }
 }
