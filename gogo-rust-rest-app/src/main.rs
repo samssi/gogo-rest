@@ -9,10 +9,8 @@ mod core;
 mod health;
 mod messages;
 
-fn init_state() -> Result<Arc<AppState>, ApplicationError> {
-    let db_pool = init_deadpool().map_err(|e| {
-        ApplicationError::StartupError(format!("Failed to create Postgres database pool: {e}"))
-    })?;
+fn create_state() -> Result<Arc<AppState>, ApplicationError> {
+    let db_pool = init_deadpool()?;
 
     let state = Arc::new(AppState { db_pool });
     Ok(state)
@@ -20,18 +18,16 @@ fn init_state() -> Result<Arc<AppState>, ApplicationError> {
 
 #[tokio::main]
 async fn main() -> Result<(), ApplicationError> {
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
 
-    let state = init_state()?;
+    let state = create_state()?;
 
     let routes = create_health_router()
         .merge(create_messages_router())
         .with_state(state);
 
     println!("Listening on http://0.0.0.0:3000");
-    axum::serve(listener, routes)
-        .await
-        .map_err(|e| ApplicationError::StartupError(e.to_string()))?;
+    axum::serve(listener, routes).await?;
 
     Ok(())
 }
