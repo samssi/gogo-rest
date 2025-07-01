@@ -13,17 +13,11 @@ impl From<tokio_postgres::Error> for DatabaseError {
 }
 
 impl DbMessage {
-    pub async fn insert_message(
-        app_state: AppState,
-        message: DbMessage,
-    ) -> Result<(), DatabaseError> {
+    pub async fn insert_message(app_state: AppState, message: String) -> Result<(), DatabaseError> {
         let connection = app_state.db_pool.get().await.unwrap();
 
         connection
-            .execute(
-                "insert into message (message) values ($1)",
-                &[&message.message],
-            )
+            .execute("insert into message (message) values ($1)", &[&message])
             .await?;
 
         Ok(())
