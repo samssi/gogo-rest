@@ -1,5 +1,5 @@
-use crate::common::axum::AppState;
-use crate::common::errors::DatabaseError;
+use crate::core::axum::AppState;
+use crate::core::errors::DatabaseError;
 use std::sync::Arc;
 
 pub struct DbMessage {

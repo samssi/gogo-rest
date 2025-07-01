@@ -1,4 +1,4 @@
-use crate::common::axum::{ApiResponse, AppState};
+use crate::core::axum::{ApiResponse, AppState};
 use axum::routing::get;
 use axum::Router;
 use std::sync::Arc;

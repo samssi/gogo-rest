@@ -1,5 +1,5 @@
-use crate::common::axum::{ApiResponse, AppState};
-use crate::common::errors::AxumApplicationError;
+use crate::core::axum::{ApiResponse, AppState};
+use crate::core::errors::AxumApplicationError;
 use crate::messages::service;
 use crate::messages::service::MessageServiceError;
 use axum::extract::State;
