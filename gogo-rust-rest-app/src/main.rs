@@ -31,8 +31,10 @@ async fn run_axum(listener_address: &str, state: Arc<AppState>) -> Result<(), Ap
 #[tokio::main]
 async fn main() -> Result<(), ApplicationError> {
     let state = create_state()?;
+    let axum_state = state.clone();
+    let axum_task = tokio::spawn(async move { run_axum("0.0.0.0:3000", axum_state).await });
 
-    run_axum("0.0.0.0:3000", state.clone()).await?;
-
-    Ok(())
+    axum_task
+        .await
+        .map_err(|e| ApplicationError::StartupError(format!("Axum task failed to join: {e}")))?
 }
