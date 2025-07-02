@@ -1,0 +1,19 @@
+syntax = "proto3";
+package gogo.message.v1;
+
+message AddMessageRequest {
+  string message = 1;
+}
+
+message AddMessageResponse {}
+
+message ReadMessageRequest {}
+
+message ReadMessageResponse {
+  string message = 1;
+}
+
+service MessageService {
+  rpc AddMessage(AddMessageRequest) returns (AddMessageResponse);
+  rpc ReadMessage(ReadMessageRequest) returns (ReadMessageResponse);
+}
