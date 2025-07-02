@@ -90,13 +90,13 @@ async fn shutdown_signal() -> Result<(), ApplicationError> {
 }
 
 async fn cancel_tasks(task_tracker: TaskTracker, cancellation_token: CancellationToken) {
-    let start = Instant::now();
-    println!("Shutdown initiated — waiting for background tasks to complete...");
+    let start_time = Instant::now();
+    println!("Shutdown initiated, waiting for background tasks to complete...");
     task_tracker.close();
     cancellation_token.cancel();
     task_tracker.wait().await;
 
-    let duration = start.elapsed();
+    let duration = start_time.elapsed();
     println!("Shutdown in {duration:?}");
 }
 
