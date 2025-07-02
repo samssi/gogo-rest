@@ -16,19 +16,23 @@ fn create_state() -> Result<Arc<AppState>, ApplicationError> {
     Ok(state)
 }
 
-#[tokio::main]
-async fn main() -> Result<(), ApplicationError> {
-    let listener_address = "0.0.0.0:3000";
+async fn run_axum(listener_address: &str, state: Arc<AppState>) -> Result<(), ApplicationError> {
     let listener = tokio::net::TcpListener::bind(listener_address).await?;
-
-    let state = create_state()?;
 
     let routes = create_health_router()
         .merge(create_messages_router())
         .with_state(state);
 
-    println!(format!("Listening on {listener_address}"));
+    println!("Axum application listening on {}", listener_address);
     axum::serve(listener, routes).await?;
+    Ok(())
+}
+
+#[tokio::main]
+async fn main() -> Result<(), ApplicationError> {
+    let state = create_state()?;
+
+    run_axum("0.0.0.0:3000", state.clone()).await?;
 
     Ok(())
 }
