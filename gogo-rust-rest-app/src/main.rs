@@ -4,7 +4,9 @@ use crate::core::errors::ApplicationError;
 use crate::health::router::create_health_router;
 use crate::messages::router::create_messages_router;
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
+use tokio::signal;
+use tokio::signal::unix::{SignalKind, signal};
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
 
@@ -37,6 +39,8 @@ async fn run_axum(
         }
         _ = cancellation_token.cancelled() => {
             println!("Axum server received cancellation signal");
+            // TODO: placeholder to check that wait actually happens
+            tokio::time::sleep(Duration::from_secs(10)).await;
             Ok(())
         }
     }
@@ -64,6 +68,38 @@ async fn run_tonic(
     }
 }
 
+async fn shutdown_signal() -> Result<(), ApplicationError> {
+    let mut sigterm = signal(SignalKind::terminate())
+        .map_err(|err| ApplicationError::StartupError(err.to_string()))?;
+    let mut sigint = signal(SignalKind::interrupt())
+        .map_err(|err| ApplicationError::StartupError(err.to_string()))?;
+
+    tokio::select! {
+        _ = signal::ctrl_c() => {
+            println!("Received Ctrl+C");
+        }
+        _ = sigterm.recv() => {
+            println!("Received SIGTERM");
+        }
+        _ = sigint.recv() => {
+            println!("Received SIGINT");
+        }
+    }
+
+    Ok(())
+}
+
+async fn cancel_tasks(task_tracker: TaskTracker, cancellation_token: CancellationToken) {
+    let start = Instant::now();
+    println!("Shutdown initiated — waiting for background tasks to complete...");
+    task_tracker.close();
+    cancellation_token.cancel();
+    task_tracker.wait().await;
+
+    let duration = start.elapsed();
+    println!("Shutdown in {duration:?}");
+}
+
 #[tokio::main]
 async fn main() -> Result<(), ApplicationError> {
     let state = create_state()?;
@@ -75,13 +111,14 @@ async fn main() -> Result<(), ApplicationError> {
 
     let task_tracker = TaskTracker::new();
 
-    let axum_task = task_tracker
+    task_tracker
         .spawn(async move { run_axum("0.0.0.0:3000", axum_state, axum_cancellation_token).await });
 
-    let tonic_task = task_tracker
+    task_tracker
         .spawn(async move { run_tonic("0.0.0.0:3001", state, tonic_cancellation_token).await });
 
-    axum_task
-        .await
-        .map_err(|e| ApplicationError::StartupError(format!("Axum task failed to join: {e}")))?
+    shutdown_signal().await?;
+    cancel_tasks(task_tracker, cancellation_token).await;
+
+    Ok(())
 }
