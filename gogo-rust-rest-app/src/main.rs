@@ -18,7 +18,8 @@ fn create_state() -> Result<Arc<AppState>, ApplicationError> {
 
 #[tokio::main]
 async fn main() -> Result<(), ApplicationError> {
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
+    let listener_address = "0.0.0.0:3000";
+    let listener = tokio::net::TcpListener::bind(listener_address).await?;
 
     let state = create_state()?;
 
@@ -26,7 +27,7 @@ async fn main() -> Result<(), ApplicationError> {
         .merge(create_messages_router())
         .with_state(state);
 
-    println!("Listening on http://0.0.0.0:3000");
+    println!(format!("Listening on {listener_address}"));
     axum::serve(listener, routes).await?;
 
     Ok(())
