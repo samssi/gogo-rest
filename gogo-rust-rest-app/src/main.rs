@@ -6,6 +6,7 @@ use crate::messages::router::create_messages_router;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio_util::sync::CancellationToken;
+use tokio_util::task::TaskTracker;
 
 mod core;
 mod health;
@@ -29,7 +30,7 @@ async fn run_axum(
         .merge(create_messages_router())
         .with_state(state);
 
-    println!("Axum application listening on {}", listener_address);
+    println!("Axum application listening on {listener_address}");
     tokio::select! {
         result = axum::serve(listener, routes) => {
             result.map_err(|e| ApplicationError::StartupError(e.to_string()))
@@ -46,7 +47,7 @@ async fn run_tonic(
     state: Arc<AppState>,
     cancellation_token: CancellationToken,
 ) -> Result<(), ApplicationError> {
-    println!("Tonic server will listen on {}", listener_address);
+    println!("Tonic server will listen on {listener_address}");
 
     tokio::select! {
         _ = async {
@@ -72,15 +73,13 @@ async fn main() -> Result<(), ApplicationError> {
     let axum_cancellation_token = cancellation_token.clone();
     let tonic_cancellation_token = cancellation_token.clone();
 
-    let axum_task =
-        tokio::spawn(
-            async move { run_axum("0.0.0.0:3000", axum_state, axum_cancellation_token).await },
-        );
+    let task_tracker = TaskTracker::new();
 
-    let tonic_task =
-        tokio::spawn(
-            async move { run_tonic("0.0.0.0:3001", state, tonic_cancellation_token).await },
-        );
+    let axum_task = task_tracker
+        .spawn(async move { run_axum("0.0.0.0:3000", axum_state, axum_cancellation_token).await });
+
+    let tonic_task = task_tracker
+        .spawn(async move { run_tonic("0.0.0.0:3001", state, tonic_cancellation_token).await });
 
     axum_task
         .await
