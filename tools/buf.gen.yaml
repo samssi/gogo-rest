@@ -1,0 +1,14 @@
+version: v1
+plugins:
+  - name: prost
+    out: ../gogo-rust-rest-app/src/generated
+  - name: prost-serde
+    out: ../gogo-rust-rest-app/src/generated
+  - name: tonic
+    out: ../gogo-rust-rest-app/src/generated
+  - name: prost-crate
+    out: ../gogo-rust-rest-app/src/generated
+    strategy: all
+    opt:
+      - include_file=../gogo-rust-rest-app/src/generated/mod.rs
+      - gen_crate
