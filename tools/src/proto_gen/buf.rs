@@ -12,43 +12,43 @@ pub struct Buf {
 
 impl Buf {
     async fn download_prost_crate(tools_bin_dir: &PathBuf) {
+        // TODO: should be installed with cargo
         // let prost_crate_file = tools_bin_dir.join("prost-crate");
-        let prost_executable_path = tools_bin_dir.join("protoc-gen-prost-crate");
+        // let prost_executable_path = tools_bin_dir.join("protoc-gen-prost-crate");
+        //
+        // #[cfg(target_os = "macos")]
+        // println!("macos prost");
+        // let prost_url = "https://github.com/dflemstr/prost-crate/releases/latest/download/prost-crate-Darwin-aarch64";
+        //
+        // #[cfg(target_os = "linux")]
+        // let prost_url = "https://github.com/dflemstr/prost-crate/releases/latest/download/prost-crate-Linux-x86_64";
+        //
+        // #[cfg(target_os = "windows")]
+        // let prost_url = "https://github.com/dflemstr/prost-crate/releases/latest/download/prost-crate-Windows-x86_64.exe";
+        //
+        // println!("Downloading prost-crate from: {prost_url}");
+        //
+        // let bytes = reqwest::get(prost_url)
+        //     .await
+        //     .expect("Failed to download prost-crate")
+        //     .bytes()
+        //     .await
+        //     .expect("Failed to read prost-crate binary");
+        //
+        // async_fs::File::create(&prost_executable_path)
+        //     .await
+        //     .expect("Failed to create prost-crate binary")
+        //     .write_all(&bytes)
+        //     .await
+        //     .expect("Failed to write prost-crate binary");
 
-        #[cfg(target_os = "macos")]
-        println!("macos prost");
-        let prost_url = "https://github.com/dflemstr/prost-crate/releases/latest/download/prost-crate-Darwin-aarch64";
-
-        #[cfg(target_os = "linux")]
-        let prost_url = "https://github.com/dflemstr/prost-crate/releases/latest/download/prost-crate-Linux-x86_64";
-
-        #[cfg(target_os = "windows")]
-        let prost_url = "https://github.com/dflemstr/prost-crate/releases/latest/download/prost-crate-Windows-x86_64.exe";
-
-        println!("Downloading prost-crate from: {prost_url}");
-
-        let bytes = reqwest::get(prost_url)
-            .await
-            .expect("Failed to download prost-crate")
-            .bytes()
-            .await
-            .expect("Failed to read prost-crate binary");
-
-        async_fs::File::create(&prost_executable_path)
-            .await
-            .expect("Failed to create prost-crate binary")
-            .write_all(&bytes)
-            .await
-            .expect("Failed to write prost-crate binary");
-
-        set_permissions(&prost_executable_path, 0o755)
+        // set_permissions(&prost_executable_path, 0o755)
     }
 
     async fn download_buf() -> Buf {
-        // let cargo_root = find_root(Path::new("cargo.toml")).expect("Could not find cargo.toml");
         let monorepo_root =
             find_root(Path::new("docker-compose.yml")).expect("Could not find docker-compose.yml");
-        let tools_bin_dir = monorepo_root; //.join(".tools/bin");
+        let tools_bin_dir = monorepo_root.join(".tools/bin");
         let buf_executable_path = tools_bin_dir.join("buf");
 
         if !buf_executable_path.exists() {
@@ -102,7 +102,7 @@ impl Buf {
     }
 
     async fn download_extensions(tools_bin_dir: &PathBuf) {
-        Self::download_prost_crate(tools_bin_dir).await;
+        // Self::download_prost_crate(tools_bin_dir).await;
     }
 
     pub async fn exec_buf(&self) -> ExitStatus {
@@ -135,19 +135,38 @@ impl Buf {
             args.join(" ")
         );
 
-        Command::new(&self.buf_executable_path)
-            .args(&args)
+        let status = Command::new(&self.buf_executable_path)
+            .args(args)
             .env(
                 "PATH",
                 format!(
                     "{}:{}",
-                    self.tools_bin_dir.display(),
-                    std::env::var("PATH").unwrap_or_default()
+                    &self.tools_bin_dir.display(),
+                    std::env::var("PATH").unwrap()
                 ),
             )
             .current_dir(&monorepo_root)
             .status()
-            .expect("Failed to run buf")
+            .expect("Failed to run buf");
+
+        let output = Command::new("which")
+            .arg("protoc-gen-prost-crate")
+            .env(
+                "PATH",
+                format!(
+                    "{}:{}",
+                    &self.tools_bin_dir.display(),
+                    std::env::var("PATH").unwrap()
+                ),
+            )
+            .output()
+            .unwrap();
+
+        println!("output: {:?}", output);
+
+        println!("PATH: {}", std::env::var("PATH").unwrap());
+
+        status
     }
 
     pub async fn new() -> Self {
