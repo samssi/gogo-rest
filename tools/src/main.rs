@@ -1,9 +1,21 @@
+use crate::proto_gen::buf::Buf;
+use crate::proto_gen::protoc::Protoc;
+
 mod proto_gen;
 mod util;
-use crate::proto_gen::generator::Buf;
 
-#[tokio::main]
-async fn main() {
+pub async fn run_protoc() {
+    let protoc = Protoc::new().await;
+    let protoc_exec_status = protoc.exec_protoc();
+
+    if protoc_exec_status.success() {
+        println!("protoc exited with success");
+    } else {
+        println!("protoc exited with error");
+    }
+}
+
+pub async fn run_buf() {
     let buf = Buf::new().await;
     let buf_exec_status = buf.exec_buf().await;
 
@@ -12,4 +24,11 @@ async fn main() {
     } else {
         panic!("buf failed to run");
     }
+}
+
+#[tokio::main]
+async fn main() {
+    // TODO: Run buf breaking for breaking changes
+    run_buf().await;
+    //run_protoc().await;
 }

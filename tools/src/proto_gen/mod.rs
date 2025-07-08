@@ -1,1 +1,2 @@
-pub mod generator;
+pub mod buf;
+pub mod protoc;

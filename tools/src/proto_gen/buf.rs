@@ -1,6 +1,5 @@
 use crate::util::filesystem::{find_root, set_permissions};
 use std::fs;
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitStatus};
 use tokio::fs as async_fs;
@@ -13,9 +12,11 @@ pub struct Buf {
 
 impl Buf {
     async fn download_prost_crate(tools_bin_dir: &PathBuf) {
-        let prost_crate_file = tools_bin_dir.join("prost-crate");
+        // let prost_crate_file = tools_bin_dir.join("prost-crate");
+        let prost_executable_path = tools_bin_dir.join("protoc-gen-prost-crate");
 
         #[cfg(target_os = "macos")]
+        println!("macos prost");
         let prost_url = "https://github.com/dflemstr/prost-crate/releases/latest/download/prost-crate-Darwin-aarch64";
 
         #[cfg(target_os = "linux")]
@@ -33,22 +34,21 @@ impl Buf {
             .await
             .expect("Failed to read prost-crate binary");
 
-        async_fs::File::create(prost_crate_file)
+        async_fs::File::create(&prost_executable_path)
             .await
             .expect("Failed to create prost-crate binary")
             .write_all(&bytes)
             .await
             .expect("Failed to write prost-crate binary");
 
-        set_permissions(tools_bin_dir, 0o755)
-        // #[cfg(unix)]
-        // fs::set_permissions(tools_bin_dir, fs::Permissions::from_mode(0o755))
-        //     .expect("Failed to set prost-crate as executable");
+        set_permissions(&prost_executable_path, 0o755)
     }
 
     async fn download_buf() -> Buf {
-        let cargo_root = find_root(Path::new("cargo.toml")).expect("Could not find cargo.toml");
-        let tools_bin_dir = cargo_root.join(".tools/bin");
+        // let cargo_root = find_root(Path::new("cargo.toml")).expect("Could not find cargo.toml");
+        let monorepo_root =
+            find_root(Path::new("docker-compose.yml")).expect("Could not find docker-compose.yml");
+        let tools_bin_dir = monorepo_root; //.join(".tools/bin");
         let buf_executable_path = tools_bin_dir.join("buf");
 
         if !buf_executable_path.exists() {
@@ -59,6 +59,7 @@ impl Buf {
 
             #[cfg(target_os = "macos")]
             let url = "https://github.com/bufbuild/buf/releases/latest/download/buf-Darwin-arm64";
+            println!("macos buf");
 
             #[cfg(target_os = "linux")]
             let url = "https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64";
@@ -86,12 +87,7 @@ impl Buf {
                 .await
                 .expect("Failed to write buf binary");
 
-            #[cfg(unix)]
-            {
-                fs::set_permissions(&buf_executable_path, fs::Permissions::from_mode(0o755))
-                    .expect("Failed to set executable permissions");
-                println!("Set buf binary as executable");
-            }
+            set_permissions(&buf_executable_path, 0o755)
         } else {
             println!(
                 "Using cached buf binary at {}",
@@ -110,18 +106,46 @@ impl Buf {
     }
 
     pub async fn exec_buf(&self) -> ExitStatus {
-        let buf_gen_root =
-            find_root(Path::new("buf.gen.yaml")).expect("Could not find buf.gen.yaml");
+        // let buf_gen_root =
+        //     find_root(Path::new("buf.gen.yaml")).expect("Could not find buf.gen.yaml");
         let monorepo_root =
             find_root(Path::new("docker-compose.yml")).expect("Could not find docker-compose.yml");
+
+        let buf_gen_root = monorepo_root.join("gogo-rust-rest-app");
 
         let buf_yaml = buf_gen_root.join("buf.gen.yaml");
         let protos_dir = monorepo_root.join("protos");
 
+        println!("Running buf generate");
+        println!("Executable:   {}", self.buf_executable_path.display());
+        println!("Template:     {}", buf_yaml.display());
+        println!("Protos dir:   {}", protos_dir.display());
+
+        let args = [
+            "generate",
+            "--template",
+            buf_yaml.to_str().unwrap(),
+            // "--path",
+            // protos_dir.to_str().unwrap(),
+        ];
+
+        println!(
+            "Command: {} {}",
+            self.buf_executable_path.display(),
+            args.join(" ")
+        );
+
         Command::new(&self.buf_executable_path)
-            .args(["generate", "--template"])
-            .arg(buf_yaml)
-            .current_dir(&protos_dir)
+            .args(&args)
+            .env(
+                "PATH",
+                format!(
+                    "{}:{}",
+                    self.tools_bin_dir.display(),
+                    std::env::var("PATH").unwrap_or_default()
+                ),
+            )
+            .current_dir(&monorepo_root)
             .status()
             .expect("Failed to run buf")
     }
