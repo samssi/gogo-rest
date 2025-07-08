@@ -27,6 +27,6 @@ pub fn find_root(target: &Path) -> Option<PathBuf> {
 
 pub fn set_permissions(target: &PathBuf, mode: u32) {
     #[cfg(unix)]
-    fs::set_permissions(target, fs::Permissions::from_mode(0o755))
+    fs::set_permissions(target, fs::Permissions::from_mode(mode))
         .unwrap_or_else(|_| panic!("Failed to set {target:?} as executable"));
 }
