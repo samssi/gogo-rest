@@ -17,10 +17,8 @@ plugins:
       - compile_well_known_types
       - extern_path=.google.protobuf=::pbjson_types
   - plugin: prost-crate
-    out: gogo-rust-rest-app/src/gen
+    out: gogo-rust-rest-app
     strategy: all
     opt:
-      # - gen_crate=gogo-rust-rest-app/src
       - include_file=src/gen/mod.rs
-      #- gen_crate=gogo-rust-rest-app/src
-    # - no_features
+      - gen_crate=./gogo-rust-rest-app/Cargo.toml
