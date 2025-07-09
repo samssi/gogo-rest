@@ -47,9 +47,10 @@ impl Buf {
 
     async fn download_buf() -> Buf {
         let monorepo_root =
-            find_root(Path::new("docker-compose.yml")).expect("Could not find docker-compose.yml");
+            find_root(Path::new(".monoreporoot")).expect("Could not find .monoreporoot");
         let tools_bin_dir = monorepo_root.join(".tools/bin");
         let buf_executable_path = tools_bin_dir.join("buf");
+        // let buf_executable_path = monorepo_root.join("buf");
 
         if !buf_executable_path.exists() {
             println!(
@@ -109,7 +110,7 @@ impl Buf {
         // let buf_gen_root =
         //     find_root(Path::new("buf.gen.yaml")).expect("Could not find buf.gen.yaml");
         let monorepo_root =
-            find_root(Path::new("docker-compose.yml")).expect("Could not find docker-compose.yml");
+            find_root(Path::new(".monoreporoot")).expect("Could not find .monoreporoot");
 
         let buf_gen_root = monorepo_root.join("gogo-rust-rest-app");
 
@@ -117,9 +118,10 @@ impl Buf {
         let protos_dir = monorepo_root.join("protos");
 
         println!("Running buf generate");
-        println!("Executable:   {}", self.buf_executable_path.display());
+        println!("Buf executable:   {}", self.buf_executable_path.display());
         println!("Template:     {}", buf_yaml.display());
         println!("Protos dir:   {}", protos_dir.display());
+        println!("Tools dir:   {}", self.tools_bin_dir.display());
 
         let args = [
             "generate",
@@ -141,30 +143,14 @@ impl Buf {
                 "PATH",
                 format!(
                     "{}:{}",
-                    &self.tools_bin_dir.display(),
+                    &self.tools_bin_dir.canonicalize().unwrap().display(),
                     std::env::var("PATH").unwrap()
                 ),
             )
+            .env("BUF_DEBUG", "1")
             .current_dir(&monorepo_root)
             .status()
             .expect("Failed to run buf");
-
-        let output = Command::new("which")
-            .arg("protoc-gen-prost-crate")
-            .env(
-                "PATH",
-                format!(
-                    "{}:{}",
-                    &self.tools_bin_dir.display(),
-                    std::env::var("PATH").unwrap()
-                ),
-            )
-            .output()
-            .unwrap();
-
-        println!("output: {:?}", output);
-
-        println!("PATH: {}", std::env::var("PATH").unwrap());
 
         status
     }
