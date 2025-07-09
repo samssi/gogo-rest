@@ -1,6 +1,7 @@
 use crate::proto_gen::buf::Buf;
 use tokio::signal;
 use tokio::signal::unix::{SignalKind, signal};
+use tokio::sync::oneshot;
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
 
@@ -17,11 +18,11 @@ pub async fn run_buf() -> Result<(), ApplicationError> {
     let buf_exec_status = buf.exec_buf().await;
 
     if buf_exec_status.success() {
-        println!("Buf code generation completed successfully");
+        println!("buf code generation completed successfully");
         Ok(())
     } else {
         Err(ApplicationError::ExecutionError(
-            "buf code generation failed.".to_string(),
+            "buf code generation failed".to_string(),
         ))
     }
 }
@@ -66,15 +67,22 @@ async fn cancel_tasks(task_tracker: TaskTracker, cancellation_token: Cancellatio
 async fn main() -> Result<(), ApplicationError> {
     let cancellation_token = CancellationToken::new();
     let run_buf_cancellation_token = cancellation_token.clone();
+    let (result_tx, result_rx) = oneshot::channel();
 
     let task_tracker = TaskTracker::new();
-    let buf_task_handle =
-        task_tracker.spawn(async move { buf_task(run_buf_cancellation_token).await });
+    task_tracker.spawn(async move {
+        let result = buf_task(run_buf_cancellation_token).await;
+        let _ = result_tx.send(result);
+    });
 
     tokio::select! {
-        _ = buf_task_handle => {
+        result = result_rx => {
             cancel_tasks(task_tracker, cancellation_token).await;
-            Ok(())
+            match result {
+                Ok(Ok(())) => Ok(()),
+                Ok(Err(e)) => Err(e),
+                Err(_) => Err(ApplicationError::ExecutionError("buf task channel dropped".into())),
+            }
         }
         _ = shutdown_signal() => {
             cancel_tasks(task_tracker, cancellation_token).await;
