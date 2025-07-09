@@ -20,5 +20,5 @@ plugins:
     out: gogo-rust-rest-app
     strategy: all
     opt:
-      - include_file=src/gen/mod.rs
       - gen_crate=./gogo-rust-rest-app/Cargo.toml
+      - include_file=src/gen/mod.rs
