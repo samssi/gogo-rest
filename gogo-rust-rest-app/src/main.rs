@@ -1,10 +1,11 @@
-use crate::core::axum::AppState;
 use crate::core::db::init_deadpool;
 use crate::core::errors::ApplicationError;
+use crate::core::state::AppState;
+use crate::core::tonic::Tonic;
 use crate::health::router::create_health_router;
 use crate::messages::router::create_messages_router;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tokio::signal;
 use tokio::signal::unix::{SignalKind, signal};
 use tokio_util::sync::CancellationToken;
@@ -39,28 +40,22 @@ async fn run_axum(
         }
         _ = cancellation_token.cancelled() => {
             println!("Axum server received cancellation signal");
-            // TODO: placeholder to check that wait actually happens
-            tokio::time::sleep(Duration::from_secs(10)).await;
             Ok(())
         }
     }
 }
 
 async fn run_tonic(
-    listener_address: &str,
+    tonic_address: &str,
     state: Arc<AppState>,
     cancellation_token: CancellationToken,
 ) -> Result<(), ApplicationError> {
-    println!("Tonic server will listen on {listener_address}");
+    println!("Tonic server will listen on {tonic_address}");
 
     tokio::select! {
-        _ = async {
-            loop {
-                tokio::time::sleep(Duration::from_secs(5)).await;
-                println!("dummy tonic is running...");
-            }
-        } => Ok(()), // This branch never ends unless cancelled
-
+        result = Tonic::run(state.clone(), tonic_address) => {
+            result
+        }
         _ = cancellation_token.cancelled() => {
             println!("Tonic server received cancellation signal");
             Ok(())
