@@ -1,4 +1,6 @@
 version: v1
+managed:
+  enabled: false
 plugins:
   - plugin: buf.build/community/neoeinstein-prost:v0.2.3
     out: gogo-rust-rest-app/src/gen
@@ -15,7 +17,10 @@ plugins:
       - compile_well_known_types
       - extern_path=.google.protobuf=::pbjson_types
   - plugin: prost-crate
-    out: gen
+    out: gogo-rust-rest-app/src/gen
     strategy: all
     opt:
-      - gen_crate=Cargo.toml
+      # - gen_crate=gogo-rust-rest-app/src
+      - include_file=src/gen/mod.rs
+      #- gen_crate=gogo-rust-rest-app/src
+    # - no_features
