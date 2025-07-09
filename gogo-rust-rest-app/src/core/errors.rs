@@ -1,6 +1,7 @@
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use deadpool_postgres::{CreatePoolError, PoolError};
+use std::net::AddrParseError;
 use std::{fmt, io};
 
 #[derive(Debug)]
@@ -17,6 +18,18 @@ impl From<io::Error> for ApplicationError {
 impl From<CreatePoolError> for ApplicationError {
     fn from(err: CreatePoolError) -> Self {
         ApplicationError::StartupError(format!("Failed to create Postgres database pool: {err}"))
+    }
+}
+
+impl From<tonic::transport::Error> for ApplicationError {
+    fn from(value: tonic::transport::Error) -> Self {
+        ApplicationError::StartupError(format!("Tonic transport error: {}", value))
+    }
+}
+
+impl From<AddrParseError> for ApplicationError {
+    fn from(err: AddrParseError) -> Self {
+        ApplicationError::StartupError(format!("Failed to parse address: {err}"))
     }
 }
 
