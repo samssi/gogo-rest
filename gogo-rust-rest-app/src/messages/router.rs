@@ -45,6 +45,10 @@ impl Message {
         State(state): State<Arc<AppState>>,
     ) -> Result<impl IntoResponse, AxumApplicationError> {
         let message = service::Message::read_message(state).await?;
-        Ok((StatusCode::OK, Json(message)))
+
+        match message {
+            Some(message) => Ok((StatusCode::OK, Json(message)).into_response()),
+            None => Ok(StatusCode::NOT_FOUND.into_response()),
+        }
     }
 }
