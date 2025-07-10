@@ -36,8 +36,6 @@ impl Message {
         State(state): State<Arc<AppState>>,
         Json(message): Json<Message>,
     ) -> Result<impl IntoResponse, AxumApplicationError> {
-        println!("{:?}", message);
-
         service::Message::add_message(state, message.message).await?;
 
         Ok(StatusCode::OK.into_response())

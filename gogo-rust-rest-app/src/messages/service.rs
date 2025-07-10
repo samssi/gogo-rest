@@ -22,6 +22,8 @@ impl Message {
         state: Arc<AppState>,
         message: String,
     ) -> Result<(), MessageServiceError> {
+        println!("{:?}", message);
+
         DbMessage::insert_message(state, message).await?;
         Ok(())
     }
