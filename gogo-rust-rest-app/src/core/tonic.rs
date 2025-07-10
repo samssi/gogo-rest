@@ -1,5 +1,7 @@
 use crate::core::errors::ApplicationError;
 use crate::core::state::AppState;
+use crate::r#gen::gogo::message::v1::message_service_server::MessageServiceServer;
+use crate::messages::grpc::GrpcMessageService;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tonic::transport::Server;
@@ -13,10 +15,12 @@ impl Tonic {
 
         let socket_address: SocketAddr = address.parse()?;
 
-        Server::builder()
-            .add_service(health_service)
-            .serve(socket_address)
-            .await?;
+        let mut server = Server::builder().add_service(health_service);
+
+        let message_server = MessageServiceServer::new(GrpcMessageService::new(state.clone()));
+        server = server.add_service(message_server);
+
+        server.serve(socket_address).await?;
 
         Ok(())
     }

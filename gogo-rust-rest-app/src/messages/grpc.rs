@@ -22,13 +22,16 @@ impl MessageService for GrpcMessageService {
         &self,
         request: Request<AddMessageRequest>,
     ) -> Result<Response<AddMessageResponse>, Status> {
-        todo!()
+        println!("Got AddMessage from {:?}", request.remote_addr());
+        Ok(Response::new(AddMessageResponse {}))
     }
 
     async fn read_message(
         &self,
         request: Request<ReadMessageRequest>,
     ) -> Result<Response<ReadMessageResponse>, Status> {
-        todo!()
+        Ok(Response::new(ReadMessageResponse {
+            message: "hello".to_string(),
+        }))
     }
 }
