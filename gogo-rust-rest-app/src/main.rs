@@ -12,7 +12,7 @@ use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
 
 mod core;
-mod r#gen;
+mod generated;
 mod health;
 mod messages;
 

@@ -1,6 +1,6 @@
 use crate::core::errors::ApplicationError;
 use crate::core::state::AppState;
-use crate::r#gen::gogo::message::v1::message_service_server::MessageServiceServer;
+use crate::generated::gogo::message::v1::message_service_server::MessageServiceServer;
 use crate::messages::grpc::GrpcMessageService;
 use std::net::SocketAddr;
 use std::sync::Arc;

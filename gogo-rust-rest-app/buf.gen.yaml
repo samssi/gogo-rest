@@ -3,16 +3,16 @@ managed:
   enabled: false
 plugins:
   - plugin: buf.build/community/neoeinstein-prost:v0.4.0
-    out: gogo-rust-rest-app/src/gen
+    out: gogo-rust-rest-app/src/generated
     opt:
       - bytes=.
       - compile_well_known_types
       - extern_path=.google.protobuf=::pbjson_types
       - file_descriptor_set
   - plugin: buf.build/community/neoeinstein-prost-serde:v0.3.1
-    out: gogo-rust-rest-app/src/gen
+    out: gogo-rust-rest-app/src/generated
   - plugin: buf.build/community/neoeinstein-tonic:v0.4.1
-    out: gogo-rust-rest-app/src/gen
+    out: gogo-rust-rest-app/src/generated
     opt:
       - compile_well_known_types
       - extern_path=.google.protobuf=::pbjson_types
@@ -21,4 +21,4 @@ plugins:
     strategy: all
     opt:
       - gen_crate=./gogo-rust-rest-app/Cargo.toml
-      - include_file=src/gen/mod.rs
+      - include_file=src/generated/mod.rs
