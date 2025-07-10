@@ -2,16 +2,16 @@ version: v1
 managed:
   enabled: false
 plugins:
-  - plugin: buf.build/community/neoeinstein-prost:v0.2.3
+  - plugin: buf.build/community/neoeinstein-prost:v0.4.0
     out: gogo-rust-rest-app/src/gen
     opt:
       - bytes=.
       - compile_well_known_types
       - extern_path=.google.protobuf=::pbjson_types
       - file_descriptor_set
-  - plugin: buf.build/community/neoeinstein-prost-serde:v0.2.3
+  - plugin: buf.build/community/neoeinstein-prost-serde:v0.3.1
     out: gogo-rust-rest-app/src/gen
-  - plugin: buf.build/community/neoeinstein-tonic:v0.3.0
+  - plugin: buf.build/community/neoeinstein-tonic:v0.4.1
     out: gogo-rust-rest-app/src/gen
     opt:
       - compile_well_known_types
