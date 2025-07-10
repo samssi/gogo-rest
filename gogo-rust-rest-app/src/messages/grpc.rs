@@ -1,6 +1,6 @@
 use crate::core::state::AppState;
-use crate::r#gen::gogo::message::v1::message_service_server::MessageService;
-use crate::r#gen::gogo::message::v1::{
+use crate::generated::gogo::message::v1::message_service_server::MessageService;
+use crate::generated::gogo::message::v1::{
     AddMessageRequest, AddMessageResponse, ReadMessageRequest, ReadMessageResponse,
 };
 use crate::messages::service;
