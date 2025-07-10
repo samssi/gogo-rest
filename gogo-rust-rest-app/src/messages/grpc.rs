@@ -32,7 +32,6 @@ impl MessageService for GrpcMessageService {
         &self,
         request: Request<AddMessageRequest>,
     ) -> Result<Response<AddMessageResponse>, Status> {
-        println!("Got AddMessage from {:?}", request.remote_addr());
         let add_message_request = request.into_inner();
 
         service::Message::add_message(self.state.clone(), add_message_request.message).await?;
